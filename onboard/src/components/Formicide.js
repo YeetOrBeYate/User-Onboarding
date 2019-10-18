@@ -57,9 +57,13 @@ mapPropsToValues({name,email,password,terms}){
 },
 
 validationSchema: Yup.object().shape({
-    name: Yup.string().required("please enter a name"),
+    name: Yup.string()
+    .required("please enter a name")
+    .test('len', 'must be longer than 1 character', val => val.length > 1),
     email: Yup.string().required("please enter an email"),
-    password: Yup.string().required("Please enter a password")
+    password: Yup.string()
+    .required("Please enter a password")
+    .test('len', 'Your password must be at least 8 characters', val => val.length >7)
   }),
 
   handleSubmit(values,{setStatus}){
