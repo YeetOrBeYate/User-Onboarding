@@ -1,9 +1,15 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 import axios from "axios";
 import {Form,Field,withFormik} from "formik";
 import * as Yup from "yup";
 
 const Formicide = ({ values, touched, errors, status })=>{
+
+    const [user, setUser] = useState([]);
+
+    useEffect(()=>{
+        status && setUser(user=>[...user, status]);
+    },[status])
 
     return(
         <div>
@@ -15,6 +21,7 @@ const Formicide = ({ values, touched, errors, status })=>{
                 {touched.email && errors.email && <p className="error">{errors.email}</p>}
                 
                 <Field className="inputs" type="password" name="password" placeholder="Enter your password"/>
+                {touched.password && errors.password &&<p className ="error">{errors.password}</p> }
                 <label>
                     Term of Service:
                     <Field className="inputs" type="checkbox" name="terms" checked={values.terms}/>
@@ -22,7 +29,18 @@ const Formicide = ({ values, touched, errors, status })=>{
                 
                 <button type="submit">Submit</button>
             </Form>
+
+            {user.map((use,index) => (
+                <ul key={index}>
+                <li>Name: {use.name}</li>
+                <li>Email: {use.email}</li>
+                <li>password: {use.password}</li>
+                </ul>
+            ))}
+
         </div>
+
+           
     );
 }
 
@@ -39,8 +57,22 @@ mapPropsToValues({name,email,password,terms}){
 },
 
 validationSchema: Yup.object().shape({
-    name: Yup.string().required()
+    name: Yup.string().required("please enter a name"),
+    email: Yup.string().required("please enter an email"),
+    password: Yup.string().required("Please enter a password")
   }),
+
+  handleSubmit(values,{setStatus}){
+      axios
+
+      .post("https://reqres.in/api/users", values)
+      .then((res)=>{
+          console.log(res)
+          setStatus(res.data);
+          
+      })
+      .catch((err)=> console.log(err.response));
+  }
 
 })(Formicide)
 
